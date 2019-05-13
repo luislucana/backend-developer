@@ -21,10 +21,6 @@ import com.google.common.base.Preconditions;
 
 import br.com.blog.service.PostService;
 import br.com.blog.service.dto.Post;
-import br.com.starwars.web.event.PaginatedResultsRetrievedEvent;
-import br.com.starwars.web.event.ResourceCreatedEvent;
-import br.com.starwars.web.event.SingleResourceRetrievedEvent;
-import br.com.starwars.web.util.RestPreconditions;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
