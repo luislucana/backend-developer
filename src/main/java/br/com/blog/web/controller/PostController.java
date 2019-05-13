@@ -1,5 +1,10 @@
 package br.com.blog.web.controller;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,18 +18,15 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.google.common.base.Preconditions;
-
 import br.com.blog.service.PostService;
-import br.com.blog.service.dto.Post;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import br.com.blog.service.dto.PostDTO;
+
+import com.google.common.base.Preconditions;
 
 /**
  * Classe controller para operacoes da entidade Post.
@@ -49,15 +51,13 @@ public class PostController {
 			  			  @ApiResponse(code = 403, message = "Forbidden"),
 			  			  @ApiResponse(code = 404, message = "Not Found"),
 			  			  @ApiResponse(code = 500, message = "Error"/*, response = Exception.class*/)})
-	public Post create(@RequestBody final Post post, final HttpServletResponse response) {
-		Preconditions.checkNotNull(post);
+	@ResponseBody
+	public PostDTO create(@RequestBody final PostDTO postDTO, final HttpServletResponse response) {
+		Preconditions.checkNotNull(postDTO);
 		
-		final Post newPost = postService.create(post);
-        final Integer newPostId = newPost.getId();
-        
-        eventPublisher.publishEvent(new ResourceCreatedEvent(this, response, newPostId));
+		PostDTO createdPostDTO = postService.create(postDTO);
 		
-		return newPost;
+		return createdPostDTO;
 	}
 	
 	@GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -67,15 +67,15 @@ public class PostController {
 							@ApiResponse(code = 400, message = "Bad Request"),
 							@ApiResponse(code = 403, message = "Forbidden"),
 							@ApiResponse(code = 500, message = "Error"/*, response = Exception.class*/)})
-	public Page<Post> listFromDatabase(Pageable pageable, final UriComponentsBuilder uriBuilder, final HttpServletResponse response) {
+	public Page<PostDTO> listFromDatabase(Pageable pageable, final UriComponentsBuilder uriBuilder, final HttpServletResponse response) {
 		
-        final Page<Post> resultPage = postService.findPaginated(pageable.getPageNumber(), pageable.getPageSize());
+        final Page<PostDTO> resultPage = postService.findPaginated(pageable.getPageNumber(), pageable.getPageSize());
         
         if (pageable.getPageNumber() > resultPage.getTotalPages()) {
         	throw new RuntimeException("MyResourceNotFoundException");
         }
         
-        eventPublisher.publishEvent(new PaginatedResultsRetrievedEvent<Post>(Post.class, uriBuilder, response,
+        eventPublisher.publishEvent(new PaginatedResultsRetrievedEvent<PostDTO>(PostDTO.class, uriBuilder, response,
             pageable.getPageNumber(), resultPage.getTotalPages(), pageable.getPageSize()));
 
         return resultPage;
@@ -88,9 +88,9 @@ public class PostController {
 							@ApiResponse(code = 400, message = "Bad Request"),
 							@ApiResponse(code = 403, message = "Forbidden"),
 							@ApiResponse(code = 500, message = "Error"/*, response = Exception.class*/)})
-	public Post getById(@PathVariable final Long id, final HttpServletResponse response) {
+	public PostDTO getById(@PathVariable final Long id, final HttpServletResponse response) {
 		
-		final Post post = RestPreconditions.checkFound(postService.getPost(id));
+		final PostDTO post = RestPreconditions.checkFound(postService.getPost(id));
 
         eventPublisher.publishEvent(new SingleResourceRetrievedEvent(this, response));
         

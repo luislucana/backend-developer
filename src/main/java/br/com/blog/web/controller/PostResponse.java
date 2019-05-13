@@ -1,23 +1,23 @@
-package br.com.blog.service.dto;
+package br.com.blog.web.controller;
 
 
 /**
- * DTO
  * 
+ * b
  * @author Luis Lucana (luislucana@gmail.com)
  *
  */
-public class Post {
+public class PostResponse {
 	
 	private Long id;
 	
 	private String title;
 	
-	private String content;
-	
 	private String description;
 	
 	private String publicationDate;
+	
+	
 
 	public Long getId() {
 		return id;
@@ -33,14 +33,6 @@ public class Post {
 
 	public void setTitle(String title) {
 		this.title = title;
-	}
-
-	public String getContent() {
-		return content;
-	}
-
-	public void setContent(String content) {
-		this.content = content;
 	}
 
 	public String getDescription() {

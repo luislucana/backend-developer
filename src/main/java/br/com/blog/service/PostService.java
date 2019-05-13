@@ -5,8 +5,10 @@ import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import br.com.blog.persistence.mysql.repository.PostRepository;
-import br.com.blog.service.dto.Post;
+import br.com.blog.mapper.PostMapper;
+import br.com.blog.persistence.model.Post;
+import br.com.blog.persistence.repository.PostRepository;
+import br.com.blog.service.dto.PostDTO;
 
 /**
  * Classe de servico para a entidade Post.
@@ -21,28 +23,36 @@ public class PostService {
 	private PostRepository postRepository;
 	
 	@Transactional
-	public Post create(Post post) {
+	public PostDTO create(PostDTO postDTO) {
 
-		if (post == null) {
+		if (postDTO == null) {
 			throw new IllegalArgumentException("Nenhum dado foi informado.");
 		}
+		
+		Post post = PostMapper.INSTANCE.postDTOToPost(postDTO);
+		
+		Post createdPost = postRepository.save(post);
+		
+        PostDTO createdPostDTO = PostMapper.INSTANCE.postToPostDTO(createdPost);
 
-		// TODO call
-		//postRepository.save(null);
-
-		return null;
+		return createdPostDTO;
 	}
 
-	public br.com.blog.persistence.mysql.model.Post getPost(Long id) {
+	public PostDTO getPost(Long id) {
 
-		br.com.blog.persistence.mysql.model.Post post = postRepository.findById(id)
+		Post post = postRepository.findById(id)
 				.orElseThrow(() -> new IllegalArgumentException("Identificador invalido:" + id));
+		
+		PostDTO postDTO = PostMapper.INSTANCE.postToPostDTO(post);
 
-		return post;
+		return postDTO;
 	}
 
 	@Transactional
-	public br.com.blog.persistence.mysql.model.Post updatePost(br.com.blog.persistence.mysql.model.Post post, Long id) {
+	public PostDTO updatePost(PostDTO postDTO, Long id) {
+		
+		Post post = PostMapper.INSTANCE.postDTOToPost(postDTO);
+		
 		if (post.getId() != id) {
 			throw new IllegalArgumentException("Identificador invalido:" + id);
 		}
@@ -50,18 +60,21 @@ public class PostService {
 		if (!postRepository.existsById(id)) {
 			throw new IllegalArgumentException("Identificador invalido:" + id);
 		}
+		
+		Post updatedPost = postRepository.save(post);
+		
+		PostDTO updatedPostDTO = PostMapper.INSTANCE.postToPostDTO(updatedPost);
 
-		br.com.blog.persistence.mysql.model.Post savedPost = postRepository.save(post);
-
-		return savedPost;
+		return updatedPostDTO;
 	}
 
 	@Transactional
 	public void delete(Long id) {
-		br.com.blog.persistence.mysql.model.Post post = 
-				postRepository.findById(id).orElseThrow(() -> 
-				new IllegalArgumentException("Identificador invalido:" + id));
-
-		postRepository.delete(post);
+		
+		if (!postRepository.existsById(id)) {
+			throw new IllegalArgumentException("Identificador invalido:" + id);
+		}
+		
+		postRepository.deleteById(id);
 	}
 }
