@@ -38,7 +38,7 @@ import io.swagger.annotations.ApiResponses;
  */
 @RestController
 @RequestMapping(value = "/blog/post")
-@Api(tags = {"Posts API"})
+@Api(tags = {"Blog API"})
 public class PostController {
 	
 	@Autowired
@@ -92,9 +92,9 @@ public class PostController {
 							@ApiResponse(code = 400, message = "Bad Request"),
 							@ApiResponse(code = 403, message = "Forbidden"),
 							@ApiResponse(code = 500, message = "Error"/*, response = Exception.class*/)})
-	public Post getById(@PathVariable final Integer id, final HttpServletResponse response) {
+	public Post getById(@PathVariable final Long id, final HttpServletResponse response) {
 		
-		final Post post = RestPreconditions.checkFound(postService.findOne(id));
+		final Post post = RestPreconditions.checkFound(postService.getPost(id));
 
         eventPublisher.publishEvent(new SingleResourceRetrievedEvent(this, response));
         
@@ -108,7 +108,7 @@ public class PostController {
 							@ApiResponse(code = 400, message = "Bad Request"),
 							@ApiResponse(code = 403, message = "Forbidden"),
 							@ApiResponse(code = 500, message = "Error"/*, response = Exception.class*/)})
-	public void delete(@PathVariable final Integer id) {
-		postService.deleteById(id);
+	public void delete(@PathVariable final Long id) {
+		postService.delete(id);
 	}
 }

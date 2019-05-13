@@ -1,7 +1,5 @@
 package br.com.blog.service;
 
-import java.util.List;
-
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +21,7 @@ public class PostService {
 	private PostRepository postRepository;
 	
 	@Transactional
-	public Post createPlayer(Post post) {
+	public Post create(Post post) {
 
 		if (post == null) {
 			throw new IllegalArgumentException("Nenhum dado foi informado.");
@@ -59,7 +57,7 @@ public class PostService {
 	}
 
 	@Transactional
-	public void deletePlayer(Long id) {
+	public void delete(Long id) {
 		br.com.blog.persistence.mysql.model.Post post = 
 				postRepository.findById(id).orElseThrow(() -> 
 				new IllegalArgumentException("Identificador invalido:" + id));
