@@ -1,5 +1,7 @@
 package br.com.blog.service;
 
+import java.util.List;
+
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +48,15 @@ public class PostService {
 		PostDTO postDTO = PostMapper.INSTANCE.postToPostDTO(post);
 
 		return postDTO;
+	}
+	
+	public List<PostDTO> getPosts() {
+
+		List<Post> allPosts = postRepository.findAll();
+		
+		List<PostDTO> allPostDTOs = PostMapper.INSTANCE.postsToPostDTOs(allPosts);
+
+		return allPostDTOs;
 	}
 
 	@Transactional

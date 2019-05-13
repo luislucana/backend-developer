@@ -5,11 +5,11 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import br.com.blog.service.PostService;
 import br.com.blog.service.dto.PostDTO;
@@ -51,8 +50,7 @@ public class PostController {
 			  			  @ApiResponse(code = 403, message = "Forbidden"),
 			  			  @ApiResponse(code = 404, message = "Not Found"),
 			  			  @ApiResponse(code = 500, message = "Error"/*, response = Exception.class*/)})
-	@ResponseBody
-	public PostDTO create(@RequestBody final PostDTO postDTO, final HttpServletResponse response) {
+	public @ResponseBody PostDTO create(@RequestBody final PostDTO postDTO, final HttpServletResponse response) {
 		Preconditions.checkNotNull(postDTO);
 		
 		PostDTO createdPostDTO = postService.create(postDTO);
@@ -67,18 +65,11 @@ public class PostController {
 							@ApiResponse(code = 400, message = "Bad Request"),
 							@ApiResponse(code = 403, message = "Forbidden"),
 							@ApiResponse(code = 500, message = "Error"/*, response = Exception.class*/)})
-	public Page<PostDTO> listFromDatabase(Pageable pageable, final UriComponentsBuilder uriBuilder, final HttpServletResponse response) {
+	public List<PostDTO> getAll() {
 		
-        final Page<PostDTO> resultPage = postService.findPaginated(pageable.getPageNumber(), pageable.getPageSize());
+        final List<PostDTO> allPostDTOs = postService.getPosts();
         
-        if (pageable.getPageNumber() > resultPage.getTotalPages()) {
-        	throw new RuntimeException("MyResourceNotFoundException");
-        }
-        
-        eventPublisher.publishEvent(new PaginatedResultsRetrievedEvent<PostDTO>(PostDTO.class, uriBuilder, response,
-            pageable.getPageNumber(), resultPage.getTotalPages(), pageable.getPageSize()));
-
-        return resultPage;
+        return allPostDTOs;
 	}
 	
 	@GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -88,12 +79,10 @@ public class PostController {
 							@ApiResponse(code = 400, message = "Bad Request"),
 							@ApiResponse(code = 403, message = "Forbidden"),
 							@ApiResponse(code = 500, message = "Error"/*, response = Exception.class*/)})
-	public PostDTO getById(@PathVariable final Long id, final HttpServletResponse response) {
+	public @ResponseBody PostDTO getById(@PathVariable final Long id, final HttpServletResponse response) {
 		
-		final PostDTO post = RestPreconditions.checkFound(postService.getPost(id));
+		final PostDTO post = postService.getPost(id);
 
-        eventPublisher.publishEvent(new SingleResourceRetrievedEvent(this, response));
-        
         return post;
 	}
 	
