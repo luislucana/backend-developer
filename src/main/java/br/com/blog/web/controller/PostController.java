@@ -6,12 +6,11 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.constraints.NotNull;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -59,16 +58,15 @@ public class PostController {
 		return createdPostDTO;
 	}
 	
-	@GetMapping(produces = MediaType.APPLICATION_JSON_VALUE, params = { "page", "size" })
+	@GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
 	@ApiOperation(value="Get posts", notes = "Gets a list of posts from database.")
 	@ApiResponses(value = {@ApiResponse(code = 200, message = "OK"),
 							@ApiResponse(code = 400, message = "Bad Request"),
-							@ApiResponse(code = 403, message = "Forbidden"),
 							@ApiResponse(code = 500, message = "Error"/*, response = Exception.class*/)})
-	public Page<PostDTO> getAll() {
+	public Page<PostDTO> getAll(@NotNull final Pageable pageable) {
 		
-		Pageable pageable = PageRequest.of(0, 5, Sort.by("title"));
+		//Pageable pageable = PageRequest.of(0, 5, Sort.by("title"));
 		
 		Page<PostDTO> postDTOs = postService.list(pageable);
 		

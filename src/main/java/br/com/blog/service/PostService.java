@@ -56,7 +56,7 @@ public class PostService {
 		return postDTO;
 	}
 	
-	public Page<PostDTO> list(Pageable pageable) {
+	public Page<PostDTO> list(final Pageable pageable) {
 
 		Page<Post> allPosts = postRepository.findAll(pageable);
 		
