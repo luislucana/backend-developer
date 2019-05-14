@@ -1,10 +1,14 @@
 package br.com.blog.service;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import br.com.blog.mapper.PostMapper;
@@ -33,6 +37,8 @@ public class PostService {
 		
 		Post post = PostMapper.INSTANCE.postDTOToPost(postDTO);
 		
+		post.setPublicationDate(new Date());
+		
 		Post createdPost = postRepository.save(post);
 		
         PostDTO createdPostDTO = PostMapper.INSTANCE.postToPostDTO(createdPost);
@@ -40,7 +46,7 @@ public class PostService {
 		return createdPostDTO;
 	}
 
-	public PostDTO getPost(Long id) {
+	public PostDTO getById(Long id) {
 
 		Post post = postRepository.findById(id)
 				.orElseThrow(() -> new IllegalArgumentException("Identificador invalido:" + id));
@@ -50,17 +56,19 @@ public class PostService {
 		return postDTO;
 	}
 	
-	public List<PostDTO> list() {
+	public Page<PostDTO> list(Pageable pageable) {
 
-		List<Post> allPosts = postRepository.findAll();
+		Page<Post> allPosts = postRepository.findAll(pageable);
 		
-		List<PostDTO> allPostDTOs = PostMapper.INSTANCE.postsToPostDTOs(allPosts);
+		List<PostDTO> allPostDTOs = PostMapper.INSTANCE.postsToPostDTOs(allPosts.getContent());
+		
+		Page<PostDTO> postDTOs = new PageImpl<>(allPostDTOs, pageable, allPosts.getTotalElements());
 
-		return allPostDTOs;
+		return postDTOs;
 	}
 
 	@Transactional
-	public PostDTO updatePost(PostDTO postDTO, Long id) {
+	public PostDTO update(PostDTO postDTO, Long id) {
 		
 		Post post = PostMapper.INSTANCE.postDTOToPost(postDTO);
 		

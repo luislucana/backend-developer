@@ -5,11 +5,13 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
-import java.util.List;
-
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -41,8 +43,7 @@ public class PostController {
 	@Autowired
 	private PostService postService;
 	
-	@PostMapping(value = "/create", consumes = MediaType.APPLICATION_JSON_VALUE, 
-			produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.CREATED)
 	@ApiOperation(value="Create post", notes="Creates a new post.")
 	@ApiResponses(value ={@ApiResponse(code = 201, message = "Post created"/*, response = Response.class*/),
@@ -53,23 +54,25 @@ public class PostController {
 	public @ResponseBody PostDTO create(@RequestBody final PostDTO postDTO) {
 		Preconditions.checkNotNull(postDTO);
 		
-		PostDTO createdPostDTO = postService.create(postDTO);
+		final PostDTO createdPostDTO = postService.create(postDTO);
 		
 		return createdPostDTO;
 	}
 	
-	@GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(produces = MediaType.APPLICATION_JSON_VALUE, params = { "page", "size" })
 	@ResponseStatus(HttpStatus.OK)
 	@ApiOperation(value="Get posts", notes = "Gets a list of posts from database.")
 	@ApiResponses(value = {@ApiResponse(code = 200, message = "OK"),
 							@ApiResponse(code = 400, message = "Bad Request"),
 							@ApiResponse(code = 403, message = "Forbidden"),
 							@ApiResponse(code = 500, message = "Error"/*, response = Exception.class*/)})
-	public List<PostDTO> getAll() {
+	public Page<PostDTO> getAll() {
 		
-        final List<PostDTO> allPostDTOs = postService.list();
-        
-        return allPostDTOs;
+		Pageable pageable = PageRequest.of(0, 5, Sort.by("title"));
+		
+		Page<PostDTO> postDTOs = postService.list(pageable);
+		
+        return postDTOs;
 	}
 	
 	@GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -81,7 +84,7 @@ public class PostController {
 							@ApiResponse(code = 500, message = "Error"/*, response = Exception.class*/)})
 	public @ResponseBody PostDTO getById(@PathVariable final Long id, final HttpServletResponse response) {
 		
-		final PostDTO post = postService.getPost(id);
+		final PostDTO post = postService.getById(id);
 
         return post;
 	}
