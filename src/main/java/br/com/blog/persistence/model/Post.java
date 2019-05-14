@@ -17,13 +17,13 @@ import javax.persistence.Table;
  *
  */
 @Entity
-@Table(catalog = "H2_DB", name = "POST")
+@Table(name = "POST")
 public class Post implements Serializable {
 
 	private static final long serialVersionUID = 3104036239799007274L;
 
 	@Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue
     private Long id;
 	
 	private String title;

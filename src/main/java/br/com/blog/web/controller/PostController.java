@@ -50,7 +50,7 @@ public class PostController {
 			  			  @ApiResponse(code = 403, message = "Forbidden"),
 			  			  @ApiResponse(code = 404, message = "Not Found"),
 			  			  @ApiResponse(code = 500, message = "Error"/*, response = Exception.class*/)})
-	public @ResponseBody PostDTO create(@RequestBody final PostDTO postDTO, final HttpServletResponse response) {
+	public @ResponseBody PostDTO create(@RequestBody final PostDTO postDTO) {
 		Preconditions.checkNotNull(postDTO);
 		
 		PostDTO createdPostDTO = postService.create(postDTO);
@@ -67,7 +67,7 @@ public class PostController {
 							@ApiResponse(code = 500, message = "Error"/*, response = Exception.class*/)})
 	public List<PostDTO> getAll() {
 		
-        final List<PostDTO> allPostDTOs = postService.getPosts();
+        final List<PostDTO> allPostDTOs = postService.list();
         
         return allPostDTOs;
 	}

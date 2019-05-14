@@ -60,17 +60,6 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 		return handleExceptionInternal(ex, responseBody, headers, HttpStatus.BAD_REQUEST, request);
 	}
 	
-	// 403
-	@ExceptionHandler(value = { ResourceNotFoundException.class })
-	@ResponseBody
-	protected ResponseEntity<Object> handleForbidden(final ResourceNotFoundException ex, final WebRequest request) {
-		JsonResponseMessageBody responseBodyJson = new JsonResponseMessageBody(
-				ex.getMessage() != null ? ex.getMessage() : "Operacao nao permitida.");
-		HttpHeaders httpHeaders = new HttpHeaders();
-		httpHeaders.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-		return handleExceptionInternal(ex, responseBodyJson, httpHeaders, HttpStatus.FORBIDDEN, request);
-	}
-
 	// 404
 	@ExceptionHandler(value = { EntityNotFoundException.class, ResourceNotFoundException.class })
 	@ResponseBody

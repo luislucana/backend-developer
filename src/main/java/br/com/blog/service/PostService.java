@@ -50,7 +50,7 @@ public class PostService {
 		return postDTO;
 	}
 	
-	public List<PostDTO> getPosts() {
+	public List<PostDTO> list() {
 
 		List<Post> allPosts = postRepository.findAll();
 		

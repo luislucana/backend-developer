@@ -1,3 +1,2 @@
-CREATE TABLE if not exists BLOG (
-   
-);
+--CREATE TABLE if not exists BLOG (
+--);
