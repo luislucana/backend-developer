@@ -70,11 +70,11 @@ public class PostService {
 	@Transactional
 	public PostDTO update(PostDTO postDTO, Long id) {
 		
-		Post post = PostMapper.INSTANCE.postDTOToPost(postDTO);
-		
-		if (post.getId() != id) {
-			throw new IllegalArgumentException("Identificador invalido:" + id);
+		if (postDTO == null) {
+			throw new IllegalArgumentException("Nenhum dado foi informado.");
 		}
+		
+		Post post = PostMapper.INSTANCE.postDTOToPost(postDTO);
 		
 		if (!postRepository.existsById(id)) {
 			throw new IllegalArgumentException("Identificador invalido:" + id);

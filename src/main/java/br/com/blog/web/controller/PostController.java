@@ -5,14 +5,19 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotNull;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,9 +27,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import br.com.blog.service.PostService;
 import br.com.blog.service.dto.PostDTO;
+import br.com.blog.web.event.PaginatedResultsRetrievedEvent;
+import br.com.blog.web.event.SingleResourceRetrievedEvent;
 
 import com.google.common.base.Preconditions;
 
@@ -35,12 +43,18 @@ import com.google.common.base.Preconditions;
  *
  */
 @RestController
-@RequestMapping(value = "/blog/post")
+@RequestMapping(value = "/blog/posts")
 @Api(tags = {"Blog API"})
 public class PostController {
 	
 	@Autowired
 	private PostService postService;
+	
+	@Autowired
+	private PostDTOResourceAssembler assembler;
+	
+	@Autowired
+    private ApplicationEventPublisher eventPublisher;
 	
 	@PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.CREATED)
@@ -64,13 +78,22 @@ public class PostController {
 	@ApiResponses(value = {@ApiResponse(code = 200, message = "OK"),
 							@ApiResponse(code = 400, message = "Bad Request"),
 							@ApiResponse(code = 500, message = "Error"/*, response = Exception.class*/)})
-	public Page<PostDTO> getAll(@NotNull final Pageable pageable) {
+	public List<PostDTO> getAll(@NotNull final Pageable pageable, final UriComponentsBuilder uriBuilder,
+	        final HttpServletResponse response) {
 		
 		//Pageable pageable = PageRequest.of(0, 5, Sort.by("title"));
 		
 		Page<PostDTO> postDTOs = postService.list(pageable);
 		
-        return postDTOs;
+		if (pageable.getPageNumber() > postDTOs.getTotalPages()) {
+            //throw new MyResourceNotFoundException();
+        }
+        eventPublisher.publishEvent(new PaginatedResultsRetrievedEvent<PostDTO>(PostDTO.class, uriBuilder, response,
+            pageable.getPageNumber(), postDTOs.getTotalPages(), pageable.getPageSize()));
+
+        return postDTOs.getContent();
+		
+        //return postDTOs;
 	}
 	
 	@GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -80,11 +103,15 @@ public class PostController {
 							@ApiResponse(code = 400, message = "Bad Request"),
 							@ApiResponse(code = 403, message = "Forbidden"),
 							@ApiResponse(code = 500, message = "Error"/*, response = Exception.class*/)})
-	public @ResponseBody PostDTO getById(@PathVariable final Long id, final HttpServletResponse response) {
+	public PostDTO getById(@PathVariable final Long id, final HttpServletResponse response) {
 		
 		final PostDTO post = postService.getById(id);
+		
+		eventPublisher.publishEvent(new SingleResourceRetrievedEvent(this, response));
 
         return post;
+		
+		//return assembler.toResource(post);
 	}
 	
 	@DeleteMapping(value = "/{id}")
@@ -94,7 +121,9 @@ public class PostController {
 							@ApiResponse(code = 400, message = "Bad Request"),
 							@ApiResponse(code = 403, message = "Forbidden"),
 							@ApiResponse(code = 500, message = "Error"/*, response = Exception.class*/)})
-	public void delete(@PathVariable final Long id) {
+	public ResponseEntity<?> delete(@PathVariable final Long id) {
 		postService.delete(id);
+		
+		return ResponseEntity.noContent().build();
 	}
 }

@@ -1,5 +1,7 @@
 package br.com.blog.service.dto;
 
+import java.io.Serializable;
+
 
 /**
  * DTO
@@ -7,9 +9,10 @@ package br.com.blog.service.dto;
  * @author Luis Lucana (luislucana@gmail.com)
  *
  */
-public class PostDTO {
+@SuppressWarnings("serial")
+public class PostDTO implements Serializable {
 	
-	private Long id;
+	private Long postDTOId;
 	
 	private String title;
 	
@@ -17,12 +20,12 @@ public class PostDTO {
 	
 	private String publicationDate;
 
-	public Long getId() {
-		return id;
+	public Long getPostDTOId() {
+		return postDTOId;
 	}
 
-	public void setId(Long id) {
-		this.id = id;
+	public void setPostDTOId(Long postDTOId) {
+		this.postDTOId = postDTOId;
 	}
 
 	public String getTitle() {

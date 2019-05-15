@@ -3,6 +3,7 @@ package br.com.blog.mapper;
 import java.util.List;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 import br.com.blog.persistence.model.Post;
@@ -22,9 +23,11 @@ public interface PostMapper {
 
     PostResponse postToPostResponse(Post post);
 
+    @Mapping(source = "id", target = "postDTOId")
     PostDTO postToPostDTO(Post post);
     
     List<PostDTO> postsToPostDTOs(List<Post> posts);
     
+    @Mapping(source = "postDTOId", target = "id")
     Post postDTOToPost(PostDTO postDTO);
 }
