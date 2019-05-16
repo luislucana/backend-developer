@@ -5,7 +5,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotNull;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import br.com.blog.service.PostService;
 import br.com.blog.service.dto.PostDTO;
@@ -66,8 +64,7 @@ public class PostController {
 	@ApiResponses(value = {@ApiResponse(code = 200, message = "OK"),
 							@ApiResponse(code = 400, message = "Bad Request"),
 							@ApiResponse(code = 500, message = "Error"/*, response = Exception.class*/)})
-	public PageResource<PostDTO> getAll(@NotNull final Pageable pageable, final UriComponentsBuilder uriBuilder,
-	        final HttpServletResponse response) {
+	public PageResource<PostDTO> getAll(@NotNull final Pageable pageable) {
 		
 		Page<PostDTO> postDTOs = postService.list(pageable);
 		
@@ -81,7 +78,7 @@ public class PostController {
 							@ApiResponse(code = 400, message = "Bad Request"),
 							@ApiResponse(code = 403, message = "Forbidden"),
 							@ApiResponse(code = 500, message = "Error"/*, response = Exception.class*/)})
-	public PostDTO getById(@PathVariable final Long id, final HttpServletResponse response) {
+	public PostDTO getById(@PathVariable final Long id) {
 		
 		final PostDTO post = postService.getById(id);
 		

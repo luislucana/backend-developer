@@ -10,6 +10,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.domain.Sort.Order;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.ResourceSupport;
 import org.springframework.util.Assert;
@@ -70,10 +72,23 @@ public class PageResource<T> extends ResourceSupport implements Page<T> {
 	}
 	
 	private Link buildPageLink(int page, int size, String rel) {
+		List<Order> list = getSort().get().collect(Collectors.toList());
+		
+		for (Order order : list) {
+			String property = order.getProperty();
+			Direction direction = order.getDirection();
+			if (direction == Direction.ASC) {
+				
+			} else if (direction == Direction.DESC) {
+				
+			}
+		}
+		
 		String path = getServletUriBuilder()
 				.queryParam(PAGE, page)
 				.queryParam(SIZE, size)
 				.build().toUriString();
+		
 		Link link = new Link(path, rel);
 		return link;
 	}

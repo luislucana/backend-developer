@@ -12,4 +12,6 @@ public class BlogApplicationTests {
 	@Test
 	public void contextLoads() {
 	}
+	
+	// TODO Ao testar o Service, mockar o Repository!
 }
