@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 
 /**
- * DTO
+ * DTO da entidade Post.
  * 
  * @author Luis Lucana (luislucana@gmail.com)
  *
@@ -12,7 +12,7 @@ import java.io.Serializable;
 @SuppressWarnings("serial")
 public class PostDTO implements Serializable {
 	
-	private Long postDTOId;
+	private Long Id;
 	
 	private String title;
 	
@@ -20,12 +20,12 @@ public class PostDTO implements Serializable {
 	
 	private String publicationDate;
 
-	public Long getPostDTOId() {
-		return postDTOId;
+	public Long getId() {
+		return Id;
 	}
 
-	public void setPostDTOId(Long postDTOId) {
-		this.postDTOId = postDTOId;
+	public void setId(Long id) {
+		Id = id;
 	}
 
 	public String getTitle() {

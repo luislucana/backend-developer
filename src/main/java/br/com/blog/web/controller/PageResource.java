@@ -24,7 +24,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * @author Luis Lucana (luislucana@gmail.com)
  *
  */
-public class PageResource<T> extends ResourceSupport {
+public class PageResource<T> extends ResourceSupport implements Page<T> {
 	
 	@JsonIgnore
 	private final Page<T> page;
@@ -81,63 +81,94 @@ public class PageResource<T> extends ResourceSupport {
 		return link;
 	}
 	
+	@Override
 	public int getNumber() {
 		return page.getNumber();
 	}
 
+	@Override
 	public int getSize() {
 		return page.getSize();
 	}
 
+	@Override
 	public int getTotalPages() {
 		return page.getTotalPages();
 	}
 
+	@Override
 	public int getNumberOfElements() {
 		return page.getNumberOfElements();
 	}
 
+	@Override
 	public long getTotalElements() {
 		return page.getTotalElements();
 	}
 
+	@Override
 	public boolean hasPrevious() {
 		return page.hasPrevious();
 	}
 
+	@Override
 	public boolean isFirst() {
 		return page.isFirst();
 	}
 
+	@Override
 	public boolean hasNext() {
 		return page.hasNext();
 	}
 
+	@Override
 	public boolean isLast() {
 		return page.isLast();
 	}
 
+	@Override
 	public Iterator<T> iterator() {
 		return page.iterator();
 	}
 
+	@Override
 	public List<T> getContent() {
 		return page.getContent();
 	}
 
+	@Override
 	public boolean hasContent() {
 		return page.hasContent();
 	}
 
+	@Override
 	public Sort getSort() {
 		return page.getSort();
 	}
 
+	@Override
 	public Pageable nextPageable() {
 		return hasNext() ? page.nextPageable() : Pageable.unpaged();
 	}
 
+	@Override
 	public Pageable previousPageable() {
 		return hasPrevious() ? page.previousPageable() : Pageable.unpaged();
+	}
+
+	@Override
+	public Stream<T> get() {
+		return stream();
+	}
+
+	@Override
+	public <U> Page<U> map(Function<? super T, ? extends U> converter) {
+		return new PageImpl<>(getConvertedContent(converter), getPageable(), getTotalElements());
+	}
+	
+	private <U> List<U> getConvertedContent(Function<? super T, ? extends U> converter) {
+		Assert.notNull(converter, "Function must not be null!");
+
+		return this.stream().map(converter::apply).collect(Collectors.toList());
 	}
 }
