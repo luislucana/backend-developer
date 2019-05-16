@@ -15,8 +15,6 @@ import org.springframework.hateoas.ResourceSupport;
 import org.springframework.util.Assert;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 
 /**
  * Implementacao de paginacao e de links de referencia (first, last, prev, next, self).
@@ -26,7 +24,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  */
 public class PageResource<T> extends ResourceSupport implements Page<T> {
 	
-	@JsonIgnore
 	private final Page<T> page;
 	
 	private final String PAGE = "page";
